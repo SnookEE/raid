@@ -15,7 +15,8 @@
 ### Champion
 
 <section>
-<script src="https://wago.io/CWSHcWRmK/embed.js?style=dark"></script>
+<script src="https://wago.io/CWSHcWRmK/embed.js?style=dark">
+</script>
 </section>
 
 ### Jadefire Masters
