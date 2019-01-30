@@ -1,6 +1,6 @@
 
 
-
+https://wago.io/bfaraid2
 ### General
 
 <script src="https://wago.io/BJb1X0L1V/embed.js?style=dark"></script>
@@ -15,7 +15,7 @@
 ### Champion
 
 <section>
-<script src="ht&#8203;tps://wago.io/CWSHcWRmK/embed.js?style=dark">
+<script src="https://wago.io/CWSHcWRmK/embed.js?style=dark">
 </script>
 </section>
 
