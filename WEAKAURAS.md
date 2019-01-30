@@ -15,7 +15,7 @@
 ### Champion
 
 <section>
-<script src="https://wago.io/CWSHcWRmK/embed.js?style=dark">
+<script src="ht&#8203;tps://wago.io/CWSHcWRmK/embed.js?style=dark">
 </script>
 </section>
 
