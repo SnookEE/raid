@@ -1,0 +1,48 @@
+/**
+ * @license Copyright (c) 2003-2017, CKSource - Frederico Knabben. All rights reserved.
+ * For licensing, see LICENSE.md or http://ckeditor.com/license
+ */
+
+CKEDITOR.editorConfig = function( config ) {
+	// Define changes to default configuration here. For example:
+	// config.language = 'fr';
+	// config.uiColor = '#AADC6E';
+
+	/*
+	config.toolbar = [
+		[ 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord' ],
+		[ 'Link', 'Unlink' ],
+		[ 'Image', 'Embed', 'Table', 'HorizontalRule' ],
+		[ 'Scayt' ],
+		[ 'Source' ],
+		'/',
+		[ 'Bold', 'Italic', 'Underline', 'Strike', 'RemoveFormat' ],
+		[ 'Styles' ],
+		[ 'Format' ]
+		
+	];
+	*/
+	config.toolbar = [
+		[ 'Cut', 'Copy', 'Paste', 'PasteText', 'PasteFromWord' ],
+		[ 'Link', 'Unlink' ],
+		[ 'Image', 'MediaEmbed', 'Table', 'HorizontalRule' ],
+		[ 'Scayt' ],
+		[ 'Source' ],
+		'/',
+		[ 'Bold', 'Italic', 'Underline', 'Strike', 'RemoveFormat' ],
+		[ 'Styles' ],
+		[ 'Format' ]
+		
+	];
+	
+	config.height = '500px';
+	
+	config.extraPlugins = 'mediaembed';
+	
+	config.filebrowserUploadUrl = '/ajax/ckupload.php';
+	
+	config.enterMode = CKEDITOR.ENTER_BR;
+	
+	config.disableNativeSpellChecker = false;
+	
+};

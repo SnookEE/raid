@@ -1,0 +1,52 @@
+.scrollster .track .handle {
+	opacity: 0.5;
+	background-color: #000000;
+	position: absolute;
+	top: 0;
+	left: 0;
+	border-radius: 10px;
+	cursor: pointer;
+}
+
+.scrollster.vertical .track .handle {
+	right: 0;
+}
+
+.scrollster.horizontal .track .handle {
+	bottom: 0;
+}
+
+.scrollster .track {
+	opacity: 0;
+	transition: opacity 0.2s;
+	position: absolute;
+	bottom: 0;
+	right: 0;
+	z-index: 2;
+}
+
+.scrollster:hover .track {
+	opacity: 1;
+	transition: opacity 0.2s;
+}
+
+.scrollster.vertical .track {
+	top: 0;
+	width: 10px;
+}
+
+.scrollster.horizontal .track {
+	left: 0;
+	height: 10px;
+}
+
+.scrollster .content {
+	position: absolute;
+	top: 0;
+	left: 0;
+	z-index: 1;
+}
+
+.scrollster.horizontal .content {
+	white-space: nowrap;
+}

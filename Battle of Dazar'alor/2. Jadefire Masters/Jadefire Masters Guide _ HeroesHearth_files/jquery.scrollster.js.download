@@ -1,0 +1,115 @@
+(function($) {
+
+	jQuery.fn.extend({
+		scrollster: function(options) {
+			
+			var defaults = {
+				
+				direction: 'vertical'
+				
+			};
+			
+			var o = $.extend(defaults, options);
+			
+			this.each(function(){
+				
+				var me = $(this);
+				
+				if(!me.hasClass('scrollster')){
+				
+					if(o.direction === 'vertical'){
+
+						if(me.outerHeight() < me.prop('scrollHeight')){
+						
+							me.addClass('scrollster vertical');
+							
+							var content = me.html();
+							var contentDiv = $('<div class="content"></div>');
+							
+							me.css({ overflowY: 'hidden', position: 'absolute' });
+							
+							contentDiv.html(content);
+							
+							me.html(contentDiv);
+							
+							var track = $('<div class="track"></div>');
+							var handle = $('<div class="handle"></div>');
+							
+							var handleheight = me.outerHeight() / me.prop('scrollHeight') * 100;
+							
+							handle.css({ height: handleheight + 'px' });
+							
+							track.append(handle);
+							
+							me.append(track);
+							
+							handle.draggable({
+								axis: 'y',
+								containment: 'parent',
+								drag: function(e, ui){
+									var percentage = (ui.position.top / (track.outerHeight() - handle.outerHeight()));
+									var difference = me.prop('scrollHeight') - me.outerHeight();
+									
+									contentDiv.css({ top: '-' + (difference * percentage) + 'px' });
+								}
+							});
+							
+						}
+
+					} else if(o.direction === 'horizontal'){
+
+						if(me.outerWidth() < me.prop('scrollWidth')){
+
+							me.addClass('scrollster horizontal');
+
+							var content = me.html();
+							var contentDiv = $('<div class="content"></div>');
+
+							me.css({ overflowX: 'hidden', position: 'absolute' });
+
+							contentDiv.html(content);
+
+							me.html(contentDiv);
+
+							var track = $('<div class="track"></div>');
+							var handle = $('<div class="handle"></div>');
+
+							var handlewidth = me.outerWidth() / me.prop('scrollWidth') * 100;
+
+							handle.css({ width: handlewidth + '%' })
+
+							track.append(handle);
+
+							me.append(track);
+
+							handle.draggable({
+								axis: 'x',
+								containment: 'parent',
+								drag: function(e, ui){
+
+									var percentage = (ui.position.left / (track.outerWidth() - handle.outerWidth()));
+									var difference = me.prop('scrollWidth') - me.outerWidth();
+
+									contentDiv.css({ left: '-' + (difference * percentage) + 'px' });
+
+								}
+
+							});
+
+						}
+
+					}				
+				
+				}
+				
+			});
+
+			return this;
+		}
+	});
+
+	jQuery.fn.extend({
+		scrollster: jQuery.fn.scrollster
+	});
+
+})(jQuery);

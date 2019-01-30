@@ -1,0 +1,620 @@
+jQuery(document).ready(function($) {
+	
+	$('.follow-button, .unfollow-button').tooltip({
+		show: { effect: 'fadeIn', duration: 200 },
+		hide: { effect: 'fadeOut', duration: 500 }
+	});
+	
+	$('.follow-button').click(function(){
+		
+		var userid = $(this).attr('userid');
+		
+		$(this).hide();
+		$('.unfollow-button').show();
+		
+		var count = parseInt($(this).parents('.follow-container').find('.number').html());
+		count ++;
+		$(this).parents('.follow-container').find('.number').html(count);
+		$(this).parents('.follow-container').find('.word').html(pluralize(count, 'Follower', false));
+		
+		$.post('/ajax/tasks.php', { safe: true, method: 'follow', user_id: userid });
+		
+		return false;
+	});
+	
+	$('.unfollow-button').click(function(){
+		
+		var userid = $(this).attr('userid');
+		
+		$(this).hide();
+		$('.follow-button').show();
+		
+		var count = parseInt($(this).parents('.follow-container').find('.number').html());
+		count --;
+		$(this).parents('.follow-container').find('.number').html(count);
+		$(this).parents('.follow-container').find('.word').html(pluralize(count, 'Follower', false));
+		
+		$.post('/ajax/tasks.php', { safe: true, method: 'unfollow', user_id: userid });
+		
+		return false;
+	});
+	
+	$('.profile-gear-button').click(function(){
+		
+		if($('.profile-gear-menu').is(':visible')){
+			$('.profile-gear-menu').slideUp(200);
+		} else{
+			$('.profile-gear-menu').slideDown(200);
+		}
+		
+		return false;
+	});
+	
+	$('.profile-block-button').click(function(){
+		var userid = $(this).attr('userid');
+		
+		$('.profile-gear-menu').slideUp(200, function(){
+			$.post('/ajax/tasks.php', { safe: true, method: 'block', user_id: userid }, function(){
+				window.location = window.location;
+			});
+		});
+		
+		return false;
+	});
+	
+	$('.profile-unblock-button').click(function(){
+		
+		var userid = $(this).attr('userid');
+		
+		$.post('/ajax/tasks.php', { safe: true, method: 'unblock', user_id: userid }, function(){
+			window.location = window.location;
+		});
+		
+		return false;
+	});
+	
+	
+	$('.widget-about-edit').ckeditor({ height: 190 });
+	
+	$('.edit-widgets-container').on('click', '.get-widget-button', function(){
+		
+		var identifier = $(this).attr('identifier');
+		
+		var widget_container = $(this).parents('.widget-container');
+		
+		widget_container.replaceWith('<div class="center get-widget-loading"><img src="/images/loading.gif" /></div>');
+		
+		$.post('/ajax/profile.php', { safe: true, method: 'get_widget', identifier: identifier }, function(data){
+			$('.get-widget-loading').remove();
+			if(!$('.add-widget-container').length){
+				$('.edit-widgets-container').slideUp(300);
+			}
+			
+			$('#sidebar').append(data);
+			
+			if(identifier === 'user-about'){
+				$('.widget-about-edit').ckeditor({ height: 190 });	
+			}
+			
+		});
+		
+		return false;
+	});
+	
+	$('#sidebar').on('click', '.user-about-edit-button', function(){
+		$('.widget-about-shade').fadeIn(1000);
+		$('.widget-about-editor').fadeIn(300);
+		return false;
+	});
+	
+	$('#sidebar').on('click', '.widget-about-save', function(){
+		var content = $('.widget-about-edit').val();
+		
+		$('.user-about-content').html(content);
+		
+		$('.widget-about-shade, .widget-about-editor').fadeOut(300);
+		
+		$.post('/ajax/profile.php', { safe: true, method: 'user_about_save', content: content });
+		
+		return false;
+	});
+	
+	$('#sidebar').on('click', '.user-comfort-picks-edit-button', function(){
+		$('.widget-comfort-picks-shade').fadeIn(1000);
+		$('.widget-comfort-picks-editor').fadeIn(300);
+		return false;
+	});
+	
+	$('#sidebar').on('mouseenter', '.hero-selector', function(){
+		$(this).parent().find('.title').stop().slideDown(200);
+	});
+	
+	$('#sidebar').on('mouseleave', '.hero-selector', function(){
+		$(this).parent().find('.title').stop().slideUp(200);
+	});
+	
+	$('#sidebar').on('click', '.hero-selector', function(){
+		
+		var hero_id = $(this).attr('heroid');
+		
+		var method = false;
+		
+		if($(this).hasClass('selected')){
+			
+			$(this).removeClass('selected');
+			method = 'remove_comfort_pick';
+			
+		} else{
+			if($('.hero-selector.selected').length < 9){
+				$(this).addClass('selected');
+				method = 'add_comfort_pick';
+			}
+		}
+		
+		if(method){
+			
+			$.post('/ajax/profile.php', { safe: true, method: method, hero_id: hero_id });
+			
+		}
+		
+		return false;
+	});
+	
+	$('#sidebar').on('click', '.widget-comfort-picks-save', function(){
+		
+		var picks = '';
+		
+		$('.hero-selector.selected').each(function(){
+			
+			var title = $(this).attr('title');
+			var slug = $(this).attr('slug');
+			var image = $(this).attr('image');
+			
+			picks += '<a href="/hero/' + slug + '/" class="hero-avatar" style="background-image: url(\'/images/heroes/' + image + '\');" title="' + title + '"></a>';
+			
+		});
+		
+		$('.comfort-picks-list').html(picks);
+		
+		$('.widget-comfort-picks-shade, .widget-comfort-picks-editor').fadeOut(300);
+		
+	});
+	
+	$('.profile-edit-button').click(function(){
+		
+		$(this).hide();
+		$('.cover').slideDown(1000);
+		$('.finish-button').show();
+		$('.chat-bar').hide();
+		$('.profile-edit-bar').slideDown(300);
+		
+		return false;
+	});
+	
+	$('.finish-button').click(function(){
+				
+		$(this).hide();
+		$('.profile-edit-button').show();
+		$('.cover').slideUp(300);
+		$('.profile-edit-bar').slideUp(300);
+		$('.edit-widgets-container:visible').slideUp(300);
+				
+		return false;
+	});
+	
+	var image_var = 'banner';
+	
+	function position_banner_window(){
+		var banner_top = $('.banner').offset().top;
+		var scrolled = $(window).scrollTop();
+		var new_position = banner_top - scrolled;
+		$('.banner-editor-window-container').css({ top: new_position });
+	}
+	
+	function position_avatar_window(){
+		var avatar_top = $('.profile-header-avatar').offset().top;
+		var scrolled = $(window).scrollTop();
+		var new_position = avatar_top - scrolled;
+		$('.avatar-editor-window-container').css({ top: new_position });
+	}
+	
+	$('.banner-edit-button').click(function(){
+		position_banner_window();
+		$('.banner-editor').fadeIn(300);
+		image_var = 'banner';
+		return false;
+	});
+	
+	$('.avatar-edit-button').click(function(){
+		position_avatar_window();
+		$('.avatar-editor').fadeIn(300);
+		image_var = 'avatar';
+		return false;
+	});
+	
+	$(window).scroll(function(){
+		if($('.banner-editor').is(':visible')){
+			position_banner_window();	
+		}
+		if($('.avatar-editor').is(':visible')){
+			position_avatar_window();	
+		}
+	});
+	
+	$('.banner-editor-window, .avatar-editor-window').on('dragover', function(e){
+		$(this).addClass('over');
+		e.preventDefault();
+		e.stopPropagation();
+	});
+
+	$('.banner-editor-window, .avatar-editor-window').on('dragenter', function(e){
+		$(this).addClass('over');
+		e.preventDefault();
+		e.stopPropagation();
+	});
+	
+	$('.banner-editor-window, .avatar-editor-window').on('dragleave', function(){
+		$(this).removeClass('over');
+	});
+	
+	var fd = new FormData();
+	var temp_file = '';
+	var perform_upload = false;
+	
+	function resize_avatar_preview(){
+		
+		var legendary = parseInt($('.legendary').val());
+		
+		var avatar_width = $('.avatar-preview').width();
+		var avatar_height = $('.avatar-preview').height();
+		
+		var size_var;
+		
+		var new_width;
+		var new_height;
+		
+		if(legendary === 1){
+			size_var = 140;
+		} else{
+			size_var = 180;
+		}
+		
+		if(avatar_width > avatar_height){
+			new_height = size_var;
+			new_width = (avatar_width / avatar_height) * size_var;
+		} else{
+			new_width = size_var;
+			new_height = (avatar_height / avatar_width) * size_var;
+		}
+		
+		$('.avatar-preview').css({ width: new_width, height: new_height });
+		
+	}
+	
+	var gifs_allowed = parseInt($('.gifs-allowed').val());
+	
+	function handle_file(file){
+		
+		if((file.size) > 16000000){
+		
+			$('.' + image_var + '-error').html('THERE IS A 16MB LIMIT');
+			if(!$('.' + image_var + '-error').is(':visible')){
+				$('.' + image_var + '-error').slideDown(100);
+			}
+			window.setTimeout(function(){ $('.' + image_var + '-error').slideUp(100); }, 3000);
+		} else if(!file.type.match('image.*')){
+			
+			$('.' + image_var + '-error').html('IMAGE FILES ONLY');
+			if(!$('.' + image_var + '-error').is(':visible')){
+				$('.' + image_var + '-error').slideDown(100);
+			}
+			window.setTimeout(function(){ $('.' + image_var + '-error').slideUp(100); }, 3000);
+		} else if(file.type.match('image/gif') && gifs_allowed < 1){
+			$('.' + image_var + '-error').html('GIFS AVAILABLE FOR DONORS');
+			if(!$('.' + image_var + '-error').is(':visible')){
+				$('.' + image_var + '-error').slideDown(100);
+			}
+			window.setTimeout(function(){ $('.' + image_var + '-error').slideUp(100); }, 3000);
+		} else{
+			if($('.' + image_var + '-error').is(':visible')){
+				$('.' + image_var + '-error').slideUp(100);
+			}
+			var reader = new FileReader();
+			reader.onload = function (e){
+			
+				var preview = $('.' + image_var + '-preview');
+				preview.attr('src', e.target.result);
+				preview.css({ top: 0, left: 0, width: '', height: '' });
+				
+				if(image_var === 'avatar'){
+					preview.on('load', function(){
+						resize_avatar_preview();	
+					});
+				}
+				
+				$('.' + image_var + '-position').val('0px 0px');
+			};
+			reader.readAsDataURL(file);							
+			temp_file = file;
+			perform_upload = true;
+		}
+	}
+	
+	$('.banner-editor-window, .avatar-editor-window').on('drop', function(e){
+		
+		$(this).removeClass('over');
+		
+		e.preventDefault();
+		e.stopPropagation();
+		
+		if(e.originalEvent.dataTransfer){
+			
+			if(e.originalEvent.dataTransfer.files.length){
+				
+				var files = e.originalEvent.dataTransfer.files;
+				
+				$.each(files, function(index, file){
+					handle_file(file);
+					
+				});
+											
+			}
+			
+		}
+		
+	});
+	
+	$('.banner-cancel-button').click(function(){
+		$('.banner-editor').fadeOut(300);
+		return false;
+	});
+	
+	$('.avatar-cancel-button').click(function(){
+		$('.avatar-editor').fadeOut(300);
+		return false;
+	});
+	
+	$('.banner-upload-button').click(function(){
+		$('.banner-input').trigger('click');
+		return false;
+	});
+	
+	$('.avatar-upload-button').click(function(){
+		$('.avatar-input').trigger('click');
+		return false;
+	});
+	
+	$('.banner-input, .avatar-input').change(function(){
+		handle_file(this.files[0]);
+	});
+	
+	var previous_percent = 0;
+	
+	$('.banner-save-button, .avatar-save-button').click(function(){
+		
+		$('.' + image_var + '-editor-buttons').hide();
+		if(perform_upload){
+			fd.append('file', temp_file);
+		}
+		fd.append(image_var + '_position', $('.' + image_var + '-position').val());
+		
+		fd.append('method', image_var + '_save');
+		fd.append('safe', true);
+		
+		$('.' + image_var + '-editor-progress-container').show();
+		
+		$.ajax({ 
+			
+			xhr: function() {
+				var xhrobj = $.ajaxSettings.xhr();
+				if (xhrobj.upload) {
+						xhrobj.upload.addEventListener('progress', function(event) {
+							var percent = 0;
+							var position = event.loaded || event.position;
+							var totalLoaded = event.total;
+							if (event.lengthComputable) {
+								percent = Math.ceil(position / totalLoaded * 100);
+							}
+							
+							if(percent > previous_percent){
+								$('.' + image_var + '-editor-progress').animate({ width: percent + '%' }, 100);
+								previous_percent = percent;
+							}
+						}, false);
+					}
+				return xhrobj;
+			},
+			url: '/ajax/profile.php',
+			type: 'POST',
+			data: fd,
+			processData: false,
+			contentType: false,
+			success: function(){
+				$('.' + image_var + '-editor').fadeOut(300, function(){
+					$('.' + image_var + '-editor-progress-container').hide();
+					$('.' + image_var + '-editor-progress').css({ width: 0 });
+					$('.' + image_var + '-editor-buttons').show();
+				});
+				
+				if(perform_upload){
+				
+					var reader = new FileReader();
+					reader.onload = function (e){
+					
+						var preview = $('.' + image_var);
+						preview.css({ backgroundImage: 'url(\'' + e.target.result + '\')', backgroundPosition: $('.' + image_var + '-position').val() });
+					};
+					reader.readAsDataURL(temp_file);
+					
+				} else{
+					
+					$('.' + image_var).css({ backgroundPosition: $('.' + image_var + '-position').val() });
+					
+				}
+				
+				previous_percent = 0;
+				perform_upload = false;
+				fd = new FormData();
+			}
+		});
+		
+		
+		return false;
+		
+	});
+	
+	$('.group-invite-button').click(function(){
+		
+		var groupid = $(this).attr('groupid');
+		var userid = $(this).attr('userid');
+	
+		$(this).remove();
+		$('.profile-gear-menu').slideUp(200);
+		
+		$.post('/ajax/profile.php', { safe: true, method: 'group_invite', group_id: groupid, user_id: userid }, function(data){
+			$('.group-invite-confirm').find('.response').html(data);
+			$('.group-invite-confirm').fadeIn(200);
+			$('.group-invite-shade').fadeIn(1000);
+		});
+		
+		return false;
+	});
+	
+	$('.group-invite-confirm .standard-button').click(function(){
+		$('.group-invite-confirm, .group-invite-shade').fadeOut(200);
+		return false;
+	});
+	
+	$('.profile-top .distinction-icons').each(function(){
+
+		$(this).slick({
+			infinite: true,
+			speed: 1000,
+			fade: true,
+			autoplay: true,
+			autoplaySpeed: 2000,
+			arrows: false
+		});
+
+	});
+	
+	$('.legendary-profile-tab').click(function(){
+		
+		if(!$(this).hasClass('selected')){
+			
+			$('.legendary-profile-tab.selected').removeClass('selected');
+			$(this).addClass('selected');
+			
+			var what = $(this).attr('what');
+			
+			$('.profile-bottom.legendary').find('.tab:visible').fadeOut(200, function(){
+				
+				$('.profile-bottom.legendary').find('.tab[what="' + what + '"]').fadeIn(200, function(){
+					distinction_icons();
+				});
+				
+				
+				
+			});
+			
+		}
+		
+		return false;
+		
+	});
+	
+	$('.video-slideshow').slick({
+		arrows: false,
+		autoplay: false
+	});
+	
+	$('.video-slideshow').on('beforeChange', function(event, slick, currentSlide){
+		
+		$('.slick-current').find('iframe')[0].contentWindow.postMessage('{"event":"command","func":"pauseVideo","args":""}', '*');
+		
+	});
+	
+	$('.video-selector').click(function(){
+		
+		if(!$(this).hasClass('selected')){
+			
+			$('.video-selector.selected').removeClass('selected');
+			$(this).addClass('selected');
+			
+			var slide = $(this).attr('slide');
+			$('.video-slideshow').slick('slickGoTo', slide);
+			
+		}
+		
+		return false;
+	});
+	
+	$('.profile-bottom').find('.distinction-icons.instantiate').each(function(){
+
+		$(this).slick({
+			infinite: true,
+			speed: 1000,
+			fade: true,
+			autoplay: true,
+			autoplaySpeed: 2000,
+			arrows: false
+		});
+		
+		$(this).removeClass('instantiate');
+
+	});
+	
+	function character_api_populate(par){
+		var name = par.find('.character-toggler').attr('charactername');
+		var realm = par.find('.character-toggler').attr('characterrealm');
+		var region = par.find('.character-toggler').attr('characterregion');
+		
+		$.post('/ajax/profile.php', { safe: true, method: 'character_api_populate', region: region, name: name, realm: realm }, function(data){
+			
+			data = JSON.parse(data);
+			
+			par.find('.title.raiderio').find('a').attr('href', data.raiderio.url);
+			par.find('.holder.mythic').html(data.raiderio.mythic);
+			par.find('.holder.raid').html(data.raiderio.raid);
+			
+			par.find('.title.warcraft-logs').find('a').attr('href', data.warcraft_logs.url);
+			
+		});
+	}
+	
+	$('.character-toggler').click(function(){
+		
+		var par = $(this).parents('.character-container');
+		var image = $(this).attr('image');
+		
+		
+		if(par.find('.expander').is(':visible')){
+			par.find('.expander').stop().slideUp(200);
+		} else{
+			
+			$('.expander:visible').slideUp(200);
+			par.find('.expander').stop().slideDown(200, function(){
+				$('html, body').animate({ scrollTop: (par.offset().top - 70) + 'px' }, 200);
+			});
+			
+			if(par.find('.expander').find('.stats').find('.stat').find('.holder').html().length < 1){
+				character_api_populate(par);
+			}
+			
+			par.find('.expander').find('.image').css({ backgroundImage: 'url(\'' + image + '\')' });
+			
+		}
+		
+		return false;
+		
+	});
+	
+	$('.expander:visible').each(function(){
+		
+		var par = $(this).parents('.character-container');
+		
+		character_api_populate(par);
+		
+	});
+	
+});
