@@ -2,13 +2,21 @@
 
 
 ### General
+
 <script src="https://wago.io/BJb1X0L1V/embed.js?style=dark"></script>
 
+
 ### Tank
-<script src="https://wago.io/WIrlEo2GA/embed.js?style=dark"></script>
+
+<section>
+    <script src="https://wago.io/WIrlEo2GA/embed.js?style=dark"></script>
+</section>
 
 ### Champion
+
+<section>
 <script src="https://wago.io/CWSHcWRmK/embed.js?style=dark"></script>
+</section>
 
 ### Jadefire Masters
 <script src="https://wago.io/nQKhkcSou/embed.js?style=dark"></script>
